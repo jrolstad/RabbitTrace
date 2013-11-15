@@ -13,16 +13,17 @@ namespace RabbitTracer.Console
     {
         static void Main(string[] args)
         {
+            XmlConfigurator.Configure();
+
             var url = ConfigurationManager.AppSettings.Get("RabbitMqUrl");
-            
+            var tracingExchangeName = ConfigurationManager.AppSettings.Get("TracingExchangeName");
+            var tracingQueueName = ConfigurationManager.AppSettings.Get("TracingQueuename");
+
             var connectionFactory = new ConnectionFactory {Uri = url};
 
             using ( var connection = connectionFactory.CreateConnection())
             using ( var channel = connection.CreateModel())
             {
-                const string tracingExchangeName = "amq.rabbitmq.trace";
-                const string tracingQueueName = "some_tracing_queue";
-
                 // Create the queue for subscribing to
                 channel.QueueDeclare(queue: tracingQueueName, durable: false, exclusive: false, autoDelete: true, arguments: null);
                 channel.QueueBind(queue: tracingQueueName,exchange:tracingExchangeName,routingKey: null);
@@ -32,7 +33,7 @@ namespace RabbitTracer.Console
                 {
                     var messageEncoding = Encoding.UTF8;
 
-                    XmlConfigurator.Configure();
+
                     var log = LogManager.GetLogger(typeof (Program));
 
                     foreach (BasicDeliverEventArgs message in subscription)
