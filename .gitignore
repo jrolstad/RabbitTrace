@@ -1,0 +1,17 @@
+_ReSharper.*
+obj/
+bin/
+*/Release/
+*.NetTiers.*.xml
+*.user
+packages/
+Services/TradeDesk.Service/*
+*.suo
+*.ncrunchsolution
+*.crunchsolution.cache
+*.ncrunchproject
+info-log.txt
+_NCrunch*
+UpgradeReport.*
+_UpgradeReport_Files/*
+packages/repositories.config
