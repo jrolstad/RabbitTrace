@@ -4,6 +4,8 @@ using System.Text;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.MessagePatterns;
+using RabbitTracer.Console.App.Services;
+using RabbitTracer.Console.App.Services.MessagePersistence;
 using log4net;
 using log4net.Config;
 
@@ -31,19 +33,13 @@ namespace RabbitTracer.Console
                 // Subscribe to messages
                 using (var subscription = new Subscription(model: channel, queueName: tracingQueueName))
                 {
-                    var messageEncoding = Encoding.UTF8;
-
-
-                    var log = LogManager.GetLogger(typeof (Program));
+                    var messagePersistor = new Log4NetMessagePersistenceStrategy(
+                        log:LogManager.GetLogger(typeof (Program)), 
+                        messageMapper: new PersistableMessageMapper());
 
                     foreach (BasicDeliverEventArgs message in subscription)
                     {
-                        // Process each message
-                        var body = messageEncoding.GetString(message.Body);
-                        var exchange = message.Exchange;
-                        var routingKey = message.RoutingKey;
-
-                        log.InfoFormat("{0}|{1}|{2}",exchange,routingKey,body);
+                        messagePersistor.Save(message);
 
                         subscription.Ack(message);
                     }
